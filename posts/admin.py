@@ -13,6 +13,7 @@ class PostModelAdmin(admin.ModelAdmin):
     list_editable = ["title"]
     list_filter = ['title', 'updated']
     search_fields = ['title', 'content']
+
     class Meta:
         model = Post
 

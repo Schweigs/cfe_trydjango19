@@ -61,7 +61,7 @@ def post_update(request, id=None):
     if form.is_valid():
         instance = form.save(commit=False)
         instance.save()
-        messages.success(request, 'Successfully Saved', extra_tags='html_safe')
+        messages.success(request, '<a href="#">Item</a> Saved', extra_tags='html_safe')
         return HttpResponseRedirect(instance.get_absolute_url())
 
     context = {

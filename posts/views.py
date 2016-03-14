@@ -1,3 +1,4 @@
+from urllib import quote_plus
 from django.contrib import messages
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404, redirect
@@ -29,9 +30,11 @@ def post_detail(request, id=None):
     # instance = Post.objects.get(id=1)
     # this method will return a 404 page instead:
     instance = get_object_or_404(Post, id=id)
+    share_string = quote_plus(instance.content)
     context = {
         'title': instance.title,
         'instance': instance,
+        'share_string': share_string,
     }
     return render(request, "post_detail.html", context)
 

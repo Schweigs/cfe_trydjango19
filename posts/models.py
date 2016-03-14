@@ -10,8 +10,20 @@ from django.utils.text import slugify
 # MVC - Model View Controller
 
 
+# this saves files into a given folder. in this case it is the instance id but it could for
+# example be the username
+def upload_location(instance, filename):
+    return "%s/%s" %(instance.id, filename)
+
 class Post(models.Model):
     title = models.CharField(max_length=120)
+    image = models.ImageField(upload_to=upload_location,
+                              null=True,
+                              blank=True,
+                              width_field="width_field",
+                              height_field="height_field")
+    height_field = models.IntegerField(default=0)
+    width_field = models.IntegerField(default=0)
     slug = models.SlugField(unique=True)
     content = models.TextField()
     timestamp = models.DateTimeField(auto_now=False, auto_now_add=True)

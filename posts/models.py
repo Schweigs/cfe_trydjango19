@@ -29,6 +29,8 @@ class Post(models.Model):
     width_field = models.IntegerField(default=0)
     slug = models.SlugField(unique=True)
     content = models.TextField()
+    draft = models.BooleanField(default=False)
+    publish = models.DateField(auto_now=False, auto_now_add=False)
     timestamp = models.DateTimeField(auto_now=False, auto_now_add=True)
     updated = models.DateTimeField(auto_now=True, auto_now_add=False)
 

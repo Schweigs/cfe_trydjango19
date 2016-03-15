@@ -88,10 +88,13 @@ def listing(request):
 def post_update(request, id=None):
     if not request.user.is_staff or not request.user.is_superuser:
         raise Http404
+    # if not request.user.is_authenticated:
+    #     raise Http404
     instance = get_object_or_404(Post, id=id)
     form = PostForm(request.POST or None, request.FILES or None, instance=instance)
     if form.is_valid():
         instance = form.save(commit=False)
+        instance.user = request.user
         instance.save()
         messages.success(request, '<a href="#">Item</a> Saved', extra_tags='html_safe')
         return HttpResponseRedirect(instance.get_absolute_url())

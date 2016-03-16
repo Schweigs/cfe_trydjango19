@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 from django.conf import settings
 from django.db import models
+from django.utils import timezone
 from django.core.urlresolvers import reverse
 from django.db.models.signals import pre_save
 
@@ -10,6 +11,14 @@ from django.utils.text import slugify
 # Create your models here.
 # MVC - Model View Controller
 
+
+class PostManager(models.Manager):
+    def active(self, *args, **kwargs):
+        # this overwrites the original Post.object.all() PostManager and adds some filters
+        # Post.object.all() == super(PostManager, self).all()
+        # change from .all() to .active() afterwards
+        return super(PostManager, self).filter(draft=False).filter(publish__lte=timezone.now())
+        # this needs to be instantiated in the model by calling: objects = PostManager()
 
 # this saves files into a given folder. in this case it is the instance id but it could for
 # example be the username
@@ -33,6 +42,9 @@ class Post(models.Model):
     publish = models.DateField(auto_now=False, auto_now_add=False)
     timestamp = models.DateTimeField(auto_now=False, auto_now_add=True)
     updated = models.DateTimeField(auto_now=True, auto_now_add=False)
+
+    # this instantiates the ModelManager
+    objects = PostManager()
 
     def __unicode__(self):
         return self.title

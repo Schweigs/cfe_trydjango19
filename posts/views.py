@@ -2,6 +2,7 @@ from urllib import quote_plus
 from django.contrib import messages
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render, get_object_or_404, redirect
+from django.utils import timezone
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from .forms import PostForm
@@ -32,6 +33,9 @@ def post_detail(request, id=None):
     # instance = Post.objects.get(id=1)
     # this method will return a 404 page instead:
     instance = get_object_or_404(Post, id=id)
+    if instance.draft or instance.publish > timezone.now().date():
+        if not request.user.is_staff or not request.user.is_superuser:
+            raise Http404
     share_string = quote_plus(instance.content)
     context = {
         'title': instance.title,
@@ -42,6 +46,7 @@ def post_detail(request, id=None):
 
 
 def post_list(request):
+    today = timezone.now().date()
     # if request.user.is_authenticated():
     #     context = {
     #         'title': 'My user list'
@@ -50,7 +55,9 @@ def post_list(request):
     #     context = {
     #         'title': 'List'
     #     }
-    queryset_list = Post.objects.all()#.order_by("-timestamp")
+    queryset_list = Post.objects.active()#.filter(draft=False).filter(publish__lte=timezone.now())#.all()#.order_by("-timestamp")
+    if request.user.is_staff or request.user.is_superuser:
+        queryset_list = Post.objects.all()
     # Pagination code start:
     paginator = Paginator(queryset_list, 5) # Show 25 contacts per page
     page_request_var = 'page'
@@ -67,7 +74,8 @@ def post_list(request):
     context = {
             'title': 'List',
             'object_list': queryset,
-            'page_request_var': page_request_var
+            'page_request_var': page_request_var,
+            'today': today
          }
     return render(request, "post_list.html", context)
 

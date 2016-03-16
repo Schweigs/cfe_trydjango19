@@ -12,6 +12,7 @@
                         <img src="{{ obj.image.url }}" class="img-responsive"/>
                         {% endif %}
                         <div class="caption">
+                            {% if obj.draft %}<h3 style="color: red">Draft{% if obj.publish > today %} <small>Future Post</small> {% endif %}</h3>{% endif %}
                             <h3>
                                 <a href="{{ obj.get_absolute_url }}">{{ obj.title }}</a>
                                 <small>{{ obj.publish }}</small>

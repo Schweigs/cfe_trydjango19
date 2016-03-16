@@ -2,6 +2,7 @@ from urllib import quote_plus
 from django.contrib import messages
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render, get_object_or_404, redirect
+from django.db.models import Q
 from django.utils import timezone
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
@@ -58,6 +59,15 @@ def post_list(request):
     queryset_list = Post.objects.active()#.filter(draft=False).filter(publish__lte=timezone.now())#.all()#.order_by("-timestamp")
     if request.user.is_staff or request.user.is_superuser:
         queryset_list = Post.objects.all()
+    # implementing search function:
+    query = request.GET.get('q')
+    if query:
+        queryset_list = queryset_list.filter(
+            Q(title__icontains=query) |
+            Q(content__icontains=query) |
+            Q(user__first_name__icontains=query) |
+            Q(user__last_name__icontains=query)
+        ).distinct()
     # Pagination code start:
     paginator = Paginator(queryset_list, 5) # Show 25 contacts per page
     page_request_var = 'page'
